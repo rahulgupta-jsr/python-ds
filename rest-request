@@ -1,0 +1,67 @@
+import urllib3
+import requests
+import json
+import base64
+
+
+ def parser(dict, path):
+     keys = path.split("/")
+     value = None
+     for key in keys:
+         if key[0] == "$":
+             index = int(key[1:])
+             value = value[index]
+             continue
+         if value:
+             if isinstance(value, list):
+                 next;
+             elif(value, dict):
+                 value = value.get(key)
+         if value is None:
+             value = dict.get(key)
+
+     if value:
+         return value
+
+ http = urllib3.PoolManager()
+ #login
+ headers = {"content-type":"application/json"}
+ r = http.request('POST', 'http://10.36.70.175:8000/restapi/v3/login', headers=headers, fields={'password': 'admin', 'username':'admin'})
+ print r.status
+ print r.data
+ json_response = json.loads(r.data)
+ token  = json_response['token']+":admin"
+ base64_token = base64.b64encode(token.encode())
+ base64_token = 'BASIC ' + base64_token
+ 
+ #get services
+
+ headers = {'Authorization': base64_token}
+ print headers
+ r = requests.get('http://10.36.70.175:8000/restapi/v3/services/service_4', headers=headers)
+ #print r.json()
+ print parser(r.json(), "service/data/service_4/Website Profile/exclude-url-patterns/$1")
+
+
+ exit(0)
+
+ headers = {'Authorization': base64_token}
+ print headers
+ fields = {
+           "address-version": "IPv4",
+           "status": "On",
+           "name": "service_5",
+           "port": 83,
+           "enable-access-logs": "Yes",
+           "session-timeout": 0,
+           "type": "HTTP",
+           "dps-enabled": "No",
+           "ip-address": "2.2.2.2",
+           "mask": "255.255.255.0"
+           }
+ r = http.request('POST', 'http://10.36.70.175:8000/restapi/v3/services', headers=headers, fields=fields)
+
+ print r.status
+ print r.data
+ print r.headers
+  
